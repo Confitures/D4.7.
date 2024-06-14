@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 # Импортируем класс, который говорит нам о том,
 # что в этом представлении мы будем выводить список объектов из БД
@@ -65,7 +66,8 @@ class NewsDetail(DetailView):
     context_object_name = 'news'
 
 
-class NewsCreate(CreateView):
+class NewsCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
     form_class = NewsForm
     model = Post
     template_name = 'flatpages/news_edit.html'
@@ -81,23 +83,25 @@ class NewsCreate(CreateView):
         return super().form_valid(form)
 
 
-class NewsUpdate(UpdateView):
+class NewsUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
     form_class = NewsForm
     model = Post
     template_name = 'flatpages/news_edit.html'
 
 
-class NewsDelete(DeleteView):
+class NewsDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post',)
     model = Post
     template_name = 'flatpages/news_delete.html'
     success_url = reverse_lazy('news')
 
 
-class ArticlesCreate(CreateView):
+class ArticlesCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('article.add_post',)
     form_class = NewsForm
     model = Post
     template_name = 'flatpages/articles_edit.html'
-
 
     def form_valid(self, form):  # устанавливаю по умолчанию post.item = 'article'.
         post = form.save(commit=False)
@@ -105,14 +109,16 @@ class ArticlesCreate(CreateView):
         return super().form_valid(form)
 
 
-class ArticlesUpdate(UpdateView):
+class ArticlesUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('article.change_post',)
     form_class = NewsForm
     model = Post
     queryset = Post.objects.filter(item="article")
     template_name = 'flatpages/articles_edit.html'
 
 
-class ArticlesDelete(DeleteView):
+class ArticlesDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('article.delete_post',)
     model = Post
     template_name = 'flatpages/articles_delete.html'
     success_url = reverse_lazy('news')

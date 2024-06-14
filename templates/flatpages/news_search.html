@@ -24,7 +24,9 @@ search
         <input type="submit" value="Найти" />
     </form>
 
-
+    {% if perms.news.add_post %}
+    <a href="{% url 'news_create' %}">Добавить Новость (не статью!)</a>
+    {% endif %}
 
     {% if news %}
     <h3 align="left">
@@ -39,6 +41,15 @@ search
                <td>{{ n.title }}</td>
                <td>{{ n.time_created|date:'- d M Y -' }}</td>
                <td>{{ n.text|truncatechars:21 }}</td>
+                <td>
+                    {% if perms.news.change_post %}
+                    <a href="{% url 'news_update' pk=n.id %}">Изменить  |</a>
+                    {% endif %}
+
+                    {% if perms.news.delete_post %}
+                    <a href="{% url 'news_delete' n.id %}">Удалить</a>
+                    {% endif %}
+               </td>
             </tr>
             {% endfor %}
         </table>

@@ -42,6 +42,13 @@ INSTALLED_APPS = [
     'accounts',
     'fpages',
     'django_filters',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.yandex',
+
 ]
 
 SITE_ID = 1
@@ -56,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',  # unclear
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'NewsPortal.urls'
@@ -68,13 +76,31 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',  # Удалить! или строчку ниже
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # 'django.template.context_processors.request',
             ],
         },
     },
 ]
+
+# D5.4
+# Этого раздела может не быть, добавьте его в указанном виде.
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 
 WSGI_APPLICATION = 'NewsPortal.wsgi.application'
 
@@ -117,10 +143,40 @@ USE_I18N = True
 
 USE_TZ = True
 
+SOCIALACCOUNT_PROVIDERS = {
+    # 'google': {  #  не работает!!!
+    #     'SCOPE': [
+    #         'profile',
+    #         'emaile',
+    #     ],
+    #     'AUTH_PARAMS': {
+    #         'access_type': 'online',
+    #     },
+    # },
+    'google': {
+        'APP': {
+            'client_id': '670849408620-d2eu40fqjqe4cms26f9mc8stilphbr1c.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        }
+    },
+
+    'yandex': {
+        'APP': {
+            'client_id': '123',
+            'secret': '456',
+            'key': ''
+        }
+    },
+
+}
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+LOGIN_REDIRECT_URL = "/newsportal/news/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -128,5 +184,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static"  #  для подгрузки стилей из папки static.
+    BASE_DIR / "static"  # для подгрузки стилей из папки static.
 ]
